@@ -12,7 +12,11 @@ abstract class AbstractExtensionMiddleware implements MiddlewareInterface
     {
         $parts = pathinfo($request->getUri()->getPath());
         if (!empty($parts['extension']) && $parts['extension'] === $this->getExtension()) {
-            return $next($request, $this->formatRespose($response));
+            $formattedResponse = $this->formatRespose($response);
+
+            if ($formattedResponse instanceof ResponseInterface) {
+                return $next($request, $formattedResponse);
+            }
         }
         return $next($request, $response);
     }
