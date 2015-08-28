@@ -3,19 +3,22 @@
 namespace ZendExpressive\Middlewares;
 
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response\JsonResponse;
-use Zend\Stratigility\MiddlewareInterface;
 
-class JsonMiddleware implements MiddlewareInterface
+class JsonMiddleware extends AbstractExtensionMiddleware
 {
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next = null)
-    {
-        if (strpos($request->getUri()->getPath(), '.json')) {
-            $responseBody = $response->getBody()->getContents();
-            $jsonResponse = new JsonResponse($responseBody, $response->getStatusCode(), $response->getHeaders());
+    const EXTENSION_JSON = 'json';
 
-            return $next($request, $jsonResponse);
-        }
+    protected function formatRespose(ResponseInterface $response)
+    {
+        $responseBody = (string) $response->getBody();
+
+        return new JsonResponse(['result' => $responseBody], $response->getStatusCode(), $response->getHeaders());
     }
+
+    public function getExtension()
+    {
+        return self::EXTENSION_JSON;
+    }
+
 }
