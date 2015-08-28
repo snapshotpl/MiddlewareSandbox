@@ -11,14 +11,15 @@ abstract class AbstractExtensionMiddleware implements MiddlewareInterface
     final public function __invoke(ServerRequestInterface $request, ResponseInterface $response, callable $next = null)
     {
         $parts = pathinfo($request->getUri()->getPath());
+
         if (!empty($parts['extension']) && $parts['extension'] === $this->getExtension()) {
             $formattedResponse = $this->formatRespose($response);
 
             if ($formattedResponse instanceof ResponseInterface) {
-                return $next($request, $formattedResponse);
+                return $next ? $next($request, $formattedResponse) : null;
             }
         }
-        return $next($request, $response);
+        return $next ? $next($request, $response) : null;
     }
 
     abstract protected function formatRespose(ResponseInterface $response);
